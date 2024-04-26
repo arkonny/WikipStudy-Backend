@@ -1,0 +1,46 @@
+type Quiz {
+  id: ID!
+  quiz_name: String!
+  questions: [Question!]!
+  owner: User!
+  filename: String!
+}
+
+type Question {
+  id: ID!
+  question: String!
+  type: String!
+  options: [String]
+  answers: [String]!
+}
+
+type Query {
+  quizById(id: ID!): Quiz
+  quizzes: [Quiz]
+  quizzesByOwner(ownerId: ID!): [Quiz]
+}
+
+input QuizInput {
+  quiz_name: String!
+  filename: String!
+  questions: [QuestionInput]!
+}
+
+input QuestionInput {
+  question: String!
+  type: String!
+  options: [String]
+  answers: [String]!
+}
+
+type Mutation {
+  createQuiz(input: QuizInput!): Quiz
+  """
+  Role 'admin' or 'user' are determined by the token
+  """
+  updateQuiz(id: ID!, input: QuizInput!): Quiz
+  """
+  Role 'admin' or 'user' are determined by the token
+  """
+  deleteQuiz(id: ID!): Quiz
+}

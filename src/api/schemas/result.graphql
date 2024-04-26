@@ -1,0 +1,19 @@
+type Query {
+  results(quizId: ID!): [Result]
+}
+
+input AnswerInput {
+  quizId: ID!
+  answers: [String]!
+}
+
+type Result {
+  id: ID!
+  quiz: Quiz!
+  user: User!
+  score: Int!
+}
+
+type Mutation {
+  answerQuiz(input: AnswerInput!): Result
+}

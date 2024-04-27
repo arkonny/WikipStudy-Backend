@@ -3,7 +3,7 @@ type Quiz {
   quiz_name: String!
   questions: [Question!]!
   owner: User!
-  filename: String!
+  filename: String
 }
 
 type Question {
@@ -17,12 +17,12 @@ type Question {
 type Query {
   quizById(id: ID!): Quiz
   quizzes: [Quiz]
-  quizzesByOwner(ownerId: ID!): [Quiz]
+  quizzesByOwner(owner: ID!): [Quiz]
 }
 
 input QuizInput {
   quiz_name: String!
-  filename: String!
+  filename: String
   questions: [QuestionInput]!
 }
 

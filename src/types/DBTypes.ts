@@ -27,7 +27,7 @@ type Quiz = Partial<Document> & {
   quiz_name: string;
   questions: [Types.ObjectId | Question];
   owner: Types.ObjectId | User;
-  filename: string;
+  filename: string | undefined;
 };
 
 type QuizTest = Partial<Quiz>;

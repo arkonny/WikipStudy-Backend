@@ -40,6 +40,7 @@ const Question = new mongoose.Schema({
   },
   options: {
     type: [String],
+    default: undefined,
   },
   answers: {
     type: [String],
@@ -63,7 +64,7 @@ const quizModel = new mongoose.Schema<Quiz>({
   },
   filename: {
     type: String,
-    required: true,
+    required: false,
   },
 });
 

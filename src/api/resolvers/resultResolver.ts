@@ -31,7 +31,7 @@ const resultResolver = {
   Mutation: {
     answerQuiz: async (
       _parent: undefined,
-      args: {answer: {quizId: string; answers: string[]}},
+      args: {input: {quizId: string; answers: string[]}},
       context: MyContext,
     ): Promise<Result> => {
       if (!context.userdata) {
@@ -41,7 +41,7 @@ const resultResolver = {
         });
       }
 
-      const quiz = await quizModel.findById(args.answer.quizId);
+      const quiz = await quizModel.findById(args.input.quizId);
       if (!quiz) {
         console.log('Quiz not found');
         throw new GraphQLError('Quiz not found');
@@ -49,15 +49,13 @@ const resultResolver = {
 
       let score = 0;
       for (let i = 0; i < quiz.questions.length; i++) {
-        if (quiz.questions[i].type === 'single') {
-          if (quiz.questions[i].answers.toString() === args.answer.answers[i]) {
-            score++;
-          }
+        if (quiz.questions[i].answers[0].toString() === args.input.answers[i]) {
+          score++;
         }
       }
 
       const result = await resultModel.create({
-        quiz: args.answer.quizId,
+        quiz: args.input.quizId,
         user: context.userdata.user._id,
         score,
       });

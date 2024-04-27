@@ -14,5 +14,5 @@ input AnswerInput {
 }
 
 type Mutation {
-  answerQuiz(answer: AnswerInput!): Result
+  answerQuiz(input: AnswerInput!): Result
 }

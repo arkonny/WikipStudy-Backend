@@ -14,8 +14,18 @@ const resultResolver = {
     resultsByQuiz: async (
       _parent: undefined,
       args: {quizId: string},
+      context: MyContext,
     ): Promise<Result[]> => {
-      return await resultModel.find({quiz: args.quizId});
+      if (!context.userdata) {
+        console.log('User not authenticated');
+        throw new GraphQLError('User not authenticated', {
+          extensions: {code: 'UNAUTHENTICATED'},
+        });
+      }
+      return await resultModel.find({
+        quiz: args.quizId,
+        user: context.userdata.user._id,
+      });
     },
   },
   Mutation: {

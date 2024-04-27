@@ -1,5 +1,11 @@
+type Result {
+  quiz: ID!
+  user: ID!
+  score: Int!
+}
+
 type Query {
-  results(quizId: ID!): [Result]
+  resultsByQuiz(quizId: ID!): [Result]
 }
 
 input AnswerInput {
@@ -7,13 +13,6 @@ input AnswerInput {
   answers: [String]!
 }
 
-type Result {
-  id: ID!
-  quiz: Quiz!
-  user: User!
-  score: Int!
-}
-
 type Mutation {
-  answerQuiz(input: AnswerInput!): Result
+  answerQuiz(answer: AnswerInput!): Result
 }

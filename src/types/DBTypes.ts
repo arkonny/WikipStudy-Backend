@@ -25,7 +25,7 @@ type TokenContent = {
 type Quiz = Partial<Document> & {
   id: Types.ObjectId | string;
   quiz_name: string;
-  questions: [Types.ObjectId | Question];
+  questions: [Question];
   owner: Types.ObjectId | User;
   filename: string | undefined;
 };
@@ -41,7 +41,6 @@ type Question = {
 };
 
 type Result = {
-  id: Types.ObjectId | string;
   quiz: Types.ObjectId | Quiz;
   user: Types.ObjectId | User;
   score: number;

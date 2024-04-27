@@ -1,6 +1,6 @@
 import {GraphQLError} from 'graphql';
 import quizModel from '../models/quizModel';
-import {Quiz} from '../../types/DBTypes';
+import {Quiz, QuizCard} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
 
 // TODO: create resolvers based on quiz.graphql
@@ -10,13 +10,38 @@ import {MyContext} from '../../types/MyContext';
 
 const quizResolver = {
   Query: {
-    quizById: async (_parent: undefined, args: {id: string}): Promise<Quiz> => {
-      const quiz = await quizModel.findById(args.id).populate('owner');
+    quizById: async (
+      _parent: undefined,
+      args: {id: string},
+      context: MyContext,
+    ): Promise<Quiz> => {
+      if (!context.userdata) {
+        console.log('User not authenticated');
+        throw new GraphQLError('User not authenticated', {
+          extensions: {code: 'UNAUTHENTICATED'},
+        });
+      }
+      const quiz = await quizModel.findById(args.id);
       if (!quiz) {
         console.log('Quiz not found');
         throw new GraphQLError('Quiz not found');
       }
+      if (quiz.owner.id !== context.userdata.user._id) {
+        quiz.questions.forEach((question) => {
+          question.answers = [];
+        });
+      }
       return quiz;
+    },
+    quizResearch: async (
+      _parent: undefined,
+      args: {search: string},
+    ): Promise<QuizCard[]> => {
+      return await quizModel
+        .find({
+          quiz_name: {$regex: args.search, $options: 'i'},
+        })
+        .populate('owner');
     },
     quizzes: async (): Promise<Quiz[]> => {
       return await quizModel.find().populate('owner');

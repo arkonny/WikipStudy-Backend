@@ -6,16 +6,24 @@ type Quiz {
   filename: String
 }
 
+type QuizCard {
+  id: ID!
+  quiz_name: String!
+  filename: String
+  owner: User!
+}
+
 type Question {
   id: ID!
   question: String!
   type: String!
   options: [String]
-  answers: [String]!
+  answers: [String]
 }
 
 type Query {
   quizById(id: ID!): Quiz
+  quizResearch(search: String!): [QuizCard]
   quizzes: [Quiz]
   quizzesByOwner(owner: ID!): [Quiz]
 }

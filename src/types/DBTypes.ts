@@ -30,6 +30,8 @@ type Quiz = Partial<Document> & {
   filename: string | undefined;
 };
 
+type QuizCard = Omit<Quiz, 'questions'>;
+
 type QuizTest = Partial<Quiz>;
 
 // A question can be of different types
@@ -53,6 +55,7 @@ export {
   UserTest,
   LoginUser,
   Quiz,
+  QuizCard,
   QuizTest,
   Question,
   Result,

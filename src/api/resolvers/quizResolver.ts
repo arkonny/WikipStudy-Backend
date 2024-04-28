@@ -16,7 +16,7 @@ const quizResolver = {
           extensions: {code: 'UNAUTHENTICATED'},
         });
       }
-      const quiz = await quizModel.findById(args.id);
+      const quiz = await quizModel.findById(args.id).populate('owner');
       if (!quiz) {
         console.log('Quiz not found');
         throw new GraphQLError('Quiz not found');
@@ -70,20 +70,16 @@ const quizResolver = {
         console.log('Quiz not created');
         throw new GraphQLError('Quiz not created');
       }
-      console.log('newQuiz', newQuiz);
       try {
         const quiz = await quizModel.findById(newQuiz._id).populate('owner');
         if (!quiz) {
           console.log('Quiz not found');
           throw new GraphQLError('Quiz not found');
         }
-        console.log('quiz');
-        console.log(quiz);
         return quiz;
       } catch (error) {
         console.log('error', error);
       }
-      console.log('newQuiz');
       return newQuiz;
     },
 

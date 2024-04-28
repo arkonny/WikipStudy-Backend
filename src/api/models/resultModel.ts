@@ -1,6 +1,3 @@
-// mongoose schema for quiz
-// intface User is located in src/interfaces/Quiz.ts
-
 import mongoose from 'mongoose';
 import {Result} from '../../types/DBTypes';
 

@@ -6,6 +6,14 @@ type Quiz {
   filename: String
 }
 
+type Question {
+  id: ID!
+  question: String!
+  type: String!
+  options: [String]
+  answers: [String!]!
+}
+
 type QuizCard {
   id: ID!
   quiz_name: String!
@@ -13,19 +21,11 @@ type QuizCard {
   owner: User!
 }
 
-type Question {
-  id: ID!
-  question: String!
-  type: String!
-  options: [String]
-  answers: [String]
-}
-
 type Query {
   quizById(id: ID!): Quiz
   quizResearch(search: String!): [QuizCard]
-  quizzes: [Quiz]
-  quizzesByOwner(owner: ID!): [Quiz]
+  quizzes: [QuizCard]
+  quizzesByOwner(owner: ID!): [QuizCard]
 }
 
 input QuizInput {
@@ -43,12 +43,6 @@ input QuestionInput {
 
 type Mutation {
   createQuiz(input: QuizInput!): Quiz
-  """
-  Role 'admin' or 'user' are determined by the token
-  """
   updateQuiz(id: ID!, input: QuizInput!): Quiz
-  """
-  Role 'admin' or 'user' are determined by the token
-  """
   deleteQuiz(id: ID!): Quiz
 }

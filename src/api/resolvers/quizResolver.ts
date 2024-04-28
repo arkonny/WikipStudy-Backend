@@ -3,11 +3,6 @@ import quizModel from '../models/quizModel';
 import {Quiz, QuizCard} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
 
-// TODO: create resolvers based on quiz.graphql
-// note: when updating or deleting a quiz, you need to check if the user is the owner of the quiz
-// note2: when updating or deleting a quiz as admin, you need to check if the user is an admin by checking the role from the user object
-// note3: updating and deleting resolvers should be the same for users and admins. Use if statements to check if the user is the owner or an admin
-
 const quizResolver = {
   Query: {
     quizById: async (
@@ -33,6 +28,7 @@ const quizResolver = {
       }
       return quiz;
     },
+
     quizResearch: async (
       _parent: undefined,
       args: {search: string},
@@ -43,16 +39,19 @@ const quizResolver = {
         })
         .populate('owner');
     },
-    quizzes: async (): Promise<Quiz[]> => {
+
+    quizzes: async (): Promise<QuizCard[]> => {
       return await quizModel.find().populate('owner');
     },
+
     quizzesByOwner: async (
       _parent: undefined,
       args: {owner: string},
-    ): Promise<Quiz[]> => {
+    ): Promise<QuizCard[]> => {
       return await quizModel.find({owner: args.owner}).populate('owner');
     },
   },
+
   Mutation: {
     createQuiz: async (
       _parent: undefined,
@@ -74,7 +73,6 @@ const quizResolver = {
       console.log('newQuiz', newQuiz);
       try {
         const quiz = await quizModel.findById(newQuiz._id).populate('owner');
-
         if (!quiz) {
           console.log('Quiz not found');
           throw new GraphQLError('Quiz not found');
@@ -88,6 +86,7 @@ const quizResolver = {
       console.log('newQuiz');
       return newQuiz;
     },
+
     updateQuiz: async (
       _parent: undefined,
       args: {id: string; input: Quiz},
@@ -99,20 +98,15 @@ const quizResolver = {
           extensions: {code: 'UNAUTHENTICATED'},
         });
       }
-
       try {
         const quizUser = await quizModel.findById(args.id).populate('owner');
         if (!quizUser) {
           console.log('Quiz not found');
           throw new GraphQLError('Quiz not found');
-        } else if (
-          quizUser.owner.id !== contextValue.userdata.user._id &&
-          contextValue.userdata.user.role !== 'admin'
-        ) {
+        } else if (quizUser.owner.id !== contextValue.userdata.user._id) {
           console.log('User is not the owner of the quiz');
           throw new GraphQLError('User is not the owner of the quiz');
         }
-
         const quiz = await quizModel
           .findByIdAndUpdate(args.id, args.input, {
             new: true,
@@ -128,6 +122,7 @@ const quizResolver = {
       }
       return args.input;
     },
+
     deleteQuiz: async (
       _parent: undefined,
       args: {id: string},
@@ -139,19 +134,14 @@ const quizResolver = {
           extensions: {code: 'UNAUTHENTICATED'},
         });
       }
-
       const quizUser = await quizModel.findById(args.id).populate('owner');
       if (!quizUser) {
         console.log('Quiz not found');
         throw new GraphQLError('Quiz not found');
-      } else if (
-        quizUser.owner.id !== contextValue.userdata.user._id &&
-        contextValue.userdata.user.role !== 'admin'
-      ) {
+      } else if (quizUser.owner.id !== contextValue.userdata.user._id) {
         console.log('User is not the owner of the quiz');
         throw new GraphQLError('User is not the owner of the quiz');
       }
-
       const quiz = await quizModel.findByIdAndDelete(args.id).populate('owner');
       if (!quiz) {
         console.log('Quiz not deleted');

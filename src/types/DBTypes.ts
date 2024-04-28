@@ -4,13 +4,12 @@ type User = Partial<Document> & {
   id: Types.ObjectId | string;
   user_name: string;
   email: string;
-  role: 'user' | 'admin';
   password: string;
 };
 
-type UserOutput = Omit<User, 'password' | 'role'>;
+type UserOutput = Omit<User, 'email' | 'password'>;
 
-type UserInput = Omit<User, 'id' | 'role'>;
+type UserInput = Omit<User, 'id'>;
 
 type UserTest = Partial<User>;
 
@@ -25,8 +24,8 @@ type TokenContent = {
 type Quiz = Partial<Document> & {
   id: Types.ObjectId | string;
   quiz_name: string;
-  questions: [Question];
-  owner: Types.ObjectId | User;
+  questions: Question[];
+  owner: Types.ObjectId | UserOutput;
   filename: string | undefined;
 };
 
@@ -44,7 +43,7 @@ type Question = {
 
 type Result = {
   quiz: Types.ObjectId | Quiz;
-  user: Types.ObjectId | User;
+  user: Types.ObjectId | UserOutput;
   score: number;
 };
 

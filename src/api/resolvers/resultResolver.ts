@@ -4,11 +4,6 @@ import resultModel from '../models/resultModel';
 import {Result} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
 
-// TODO: create resolvers based on result.graphql
-// note: when updating or deleting a quiz, you need to check if the user is the owner of the quiz
-// note2: when updating or deleting a quiz as admin, you need to check if the user is an admin by checking the role from the user object
-// note3: updating and deleting resolvers should be the same for users and admins. Use if statements to check if the user is the owner or an admin
-
 const resultResolver = {
   Query: {
     resultsByQuiz: async (

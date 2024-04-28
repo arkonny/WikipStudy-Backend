@@ -4,7 +4,9 @@
 import mongoose from 'mongoose';
 import {Quiz, User} from '../../types/DBTypes';
 
-const userSchema = new mongoose.Schema<User>({
+type UserRole = User & {role: 'user' | 'admin'};
+
+const userSchema = new mongoose.Schema<UserRole>({
   user_name: {
     type: String,
     minlength: [3, 'Username must be at least 3 characters'],
@@ -26,7 +28,7 @@ const userSchema = new mongoose.Schema<User>({
   },
 });
 
-mongoose.model<User>('User', userSchema);
+mongoose.model<UserRole>('User', userSchema);
 
 const Question = new mongoose.Schema({
   question: {

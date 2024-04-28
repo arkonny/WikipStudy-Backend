@@ -1,5 +1,5 @@
 import {GraphQLError} from 'graphql';
-import {TokenContent, UserInput, UserOutput} from '../../types/DBTypes';
+import {UserInput, UserOutput} from '../../types/DBTypes';
 import fetchData from '../../functions/fetchData';
 import {
   LoginResponse,
@@ -10,22 +10,9 @@ import {MyContext} from '../../types/MyContext';
 
 // TODO: create resolvers based on user.graphql
 // note: when updating or deleting a user don't send id to the auth server, it will get it from the token. So token needs to be sent with the request to the auth server
-// note2: when updating or deleting a user as admin, you need to send user id (dont delete admin btw) and also check if the user is an admin by checking the role from the user object form context
 
 const userResolver = {
   Query: {
-    users: async (): Promise<UserOutput[]> => {
-      if (!process.env.AUTH_URL) {
-        throw new GraphQLError('Auth URL not set in .env file');
-      }
-      const users = await fetchData<UserOutput[]>(
-        process.env.AUTH_URL + '/users',
-      );
-      users.forEach((user) => {
-        user.id = user._id;
-      });
-      return users;
-    },
     userById: async (
       _parent: undefined,
       args: {id: string},
@@ -156,70 +143,6 @@ const userResolver = {
 
       user.id = user._id;
 
-      return {message: message.message, user: user};
-    },
-
-    updateUserAsAdmin: async (
-      _parent: undefined,
-      args: {user: UserInput; id: string},
-      context: MyContext,
-    ): Promise<UserResponse> => {
-      if (!process.env.AUTH_URL) {
-        throw new GraphQLError('Auth URL not set in .env file');
-      }
-      console.log('context', context.userdata);
-      if (!context.userdata) {
-        throw new GraphQLError('User not authenticated');
-      } else if (context.userdata.user.role !== 'admin') {
-        console.log('context', context.userdata);
-        throw new GraphQLError('User is not an admin');
-      }
-
-      const options = {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + context.userdata.token,
-        },
-        body: JSON.stringify(args.user),
-      };
-
-      const response = await fetchData<MessageResponse & {data: UserOutput}>(
-        process.env.AUTH_URL + '/users/' + args.id,
-        options,
-      );
-      response.data.id = response.data._id;
-      return {message: response.message, user: response.data};
-    },
-
-    deleteUserAsAdmin: async (
-      _parent: undefined,
-      args: {id: string},
-      context: MyContext,
-    ): Promise<UserResponse> => {
-      if (!process.env.AUTH_URL) {
-        throw new GraphQLError('Auth URL not set in .env file');
-      }
-      if (!context.userdata) {
-        throw new GraphQLError('User not authenticated');
-      } else if (context.userdata.user.role !== 'admin') {
-        throw new GraphQLError('User is not an admin');
-      }
-
-      const user = await userResolver.Query.userById(_parent, {id: args.id});
-
-      const options = {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + context.userdata.token,
-        },
-      };
-
-      const message = await fetchData<MessageResponse>(
-        process.env.AUTH_URL + '/users/' + args.id,
-        options,
-      );
       return {message: message.message, user: user};
     },
   },

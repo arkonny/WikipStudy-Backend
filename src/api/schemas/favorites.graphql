@@ -1,0 +1,13 @@
+type Favorites {
+  owner: ID!
+  items: [QuizCard!]!
+}
+
+type Query {
+  favoritesGet: Favorites
+}
+
+type Mutation {
+  favoritesAdd(quizId: ID!): Favorites
+  favoritesRemove(quizId: ID!): Favorites
+}

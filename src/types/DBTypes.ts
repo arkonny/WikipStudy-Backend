@@ -29,7 +29,7 @@ type Quiz = Partial<Document> & {
   filename: string | undefined;
 };
 
-type QuizCard = Omit<Quiz, 'questions'>;
+type QuizCard = Omit<Quiz, 'questions' | 'owner'>;
 
 type QuizTest = Partial<Quiz>;
 
@@ -47,6 +47,11 @@ type Result = {
   score: number;
 };
 
+type Favorites = {
+  owner: Types.ObjectId | UserOutput;
+  items: (Types.ObjectId | QuizCard)[];
+};
+
 export {
   User,
   UserOutput,
@@ -58,5 +63,6 @@ export {
   QuizTest,
   Question,
   Result,
+  Favorites,
   TokenContent,
 };

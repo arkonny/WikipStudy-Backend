@@ -2,6 +2,7 @@ import {GraphQLError} from 'graphql';
 import quizModel from '../models/quizModel';
 import {Quiz, QuizCard} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
+import resultModel from '../models/resultModel';
 
 const quizResolver = {
   Query: {
@@ -143,6 +144,7 @@ const quizResolver = {
         console.log('Quiz not deleted');
         throw new GraphQLError('Quiz not deleted');
       }
+      await resultModel.deleteMany({quiz: args.id});
       return quiz;
     },
   },

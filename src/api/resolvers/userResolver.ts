@@ -8,6 +8,8 @@ import {
 } from '../../types/MessageTypes';
 import {MyContext} from '../../types/MyContext';
 import favoritesModel from '../models/favoritesModel';
+import quizModel from '../models/quizModel';
+import resultModel from '../models/resultModel';
 
 const userResolver = {
   Query: {
@@ -137,6 +139,12 @@ const userResolver = {
         process.env.AUTH_URL + '/users',
         options,
       );
+      // delete the user's favorites, quizzes and results
+      if (message.message === 'User deleted') {
+        await favoritesModel.deleteOne({owner: user._id});
+        await quizModel.deleteMany({owner: user._id});
+        await resultModel.deleteMany({owner: user._id});
+      }
       user.id = user._id;
       return {message: message.message, user: user};
     },

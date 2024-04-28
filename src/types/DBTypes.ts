@@ -43,7 +43,7 @@ type Question = {
 
 type Result = {
   quiz: Types.ObjectId | Quiz;
-  user: Types.ObjectId | UserOutput;
+  owner: Types.ObjectId | UserOutput;
   score: number;
 };
 

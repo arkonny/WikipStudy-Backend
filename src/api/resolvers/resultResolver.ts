@@ -19,7 +19,7 @@ const resultResolver = {
       }
       return await resultModel.find({
         quiz: args.quizId,
-        user: context.userdata.user._id,
+        owner: context.userdata.user._id,
       });
     },
   },
@@ -51,7 +51,7 @@ const resultResolver = {
 
       const result = await resultModel.create({
         quiz: args.input.quizId,
-        user: context.userdata.user._id,
+        owner: context.userdata.user._id,
         score,
       });
 

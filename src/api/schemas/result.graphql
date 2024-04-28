@@ -1,6 +1,6 @@
 type Result {
   quiz: ID!
-  user: ID!
+  owner: ID!
   score: Int!
 }
 

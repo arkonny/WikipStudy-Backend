@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema<UserRole>({
   user_name: {
     type: String,
     minlength: [3, 'Username must be at least 3 characters'],
-    unique: true,
   },
   email: {
     type: String,

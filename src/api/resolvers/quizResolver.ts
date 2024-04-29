@@ -3,6 +3,8 @@ import quizModel from '../models/quizModel';
 import {Quiz, QuizCard} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
 import resultModel from '../models/resultModel';
+import wikiPage from '../../functions/wikiPage';
+import textToQuestions from '../../functions/textToQuestions';
 
 const quizResolver = {
   Query: {
@@ -118,6 +120,35 @@ const quizResolver = {
         console.log('error', error);
       }
       return args.input;
+    },
+
+    generateQuiz: async (
+      _parent: undefined,
+      args: {search: string},
+      contextValue: MyContext,
+    ): Promise<Quiz> => {
+      if (!contextValue.userdata) {
+        console.log('User not authenticated');
+        throw new GraphQLError('User not authenticated', {
+          extensions: {code: 'UNAUTHENTICATED'},
+        });
+      }
+
+      const page = await wikiPage(args.search);
+      console.log('Page :\n', page, '\n');
+      const questions = await textToQuestions(page);
+      //console.log('Questions :\n', questions, '\n');
+
+      const newQuiz = new quizModel({
+        quiz_name: args.search,
+        questions: questions,
+        owner: contextValue.userdata.user._id,
+      });
+
+      console.log('Quiz not saved for now !!');
+      // const quiz = await newQuiz.save();
+
+      return newQuiz.populate('owner');
     },
 
     deleteQuiz: async (

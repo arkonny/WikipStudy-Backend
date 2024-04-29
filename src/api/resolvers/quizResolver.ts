@@ -137,7 +137,7 @@ const quizResolver = {
       const page = await wikiPage(args.search);
       console.log('Page :\n', page, '\n');
       const questions = await textToQuestions(page);
-      //console.log('Questions :\n', questions, '\n');
+      console.log('Questions :\n', questions, '\n');
 
       const newQuiz = new quizModel({
         quiz_name: args.search,
@@ -145,10 +145,9 @@ const quizResolver = {
         owner: contextValue.userdata.user._id,
       });
 
-      console.log('Quiz not saved for now !!');
-      // const quiz = await newQuiz.save();
+      const quiz = await newQuiz.save();
 
-      return newQuiz.populate('owner');
+      return quiz.populate('owner');
     },
 
     deleteQuiz: async (

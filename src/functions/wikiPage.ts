@@ -9,6 +9,7 @@ interface wikiAPIParameters {
   format?: string;
   titles?: string;
   prop?: string;
+  exintro?: number;
   exsentences?: string;
   explaintext?: number;
   formatversion?: string;
@@ -31,6 +32,7 @@ const wikiAPI = async (params: wikiAPIParameters): Promise<Response> => {
   return response;
 };
 
+// First we need to search for the page, allowing the user to write a more general search (still quite specific though)
 const wikiPage = async (search: string): Promise<string> => {
   const dataSearch = await (
     await wikiAPI({
@@ -47,8 +49,6 @@ const wikiPage = async (search: string): Promise<string> => {
     throw new GraphQLError('No data from Wikipedia');
   }
 
-  console.log(dataSearch);
-
   const title = dataSearch[3][0].toString().replace(/.*\//g, '');
 
   // Now we need to get the page content
@@ -57,7 +57,7 @@ const wikiPage = async (search: string): Promise<string> => {
       titles: title,
       action: 'query',
       prop: 'extracts',
-      exsentences: '4',
+      exsentences: '5',
       explaintext: 1,
       formatversion: '2',
       format: 'json',

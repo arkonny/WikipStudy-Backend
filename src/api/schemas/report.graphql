@@ -1,0 +1,9 @@
+type Report {
+  target: ID!
+  source: ID!
+  message: String
+}
+
+type Mutation {
+  reportAdd(target: ID!, message: String): Report
+}

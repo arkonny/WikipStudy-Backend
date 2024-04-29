@@ -52,6 +52,12 @@ type Favorites = {
   items: (Types.ObjectId | QuizCard)[];
 };
 
+type Report = {
+  target: Types.ObjectId | Quiz;
+  source: Types.ObjectId | User;
+  message: string;
+};
+
 export {
   User,
   UserOutput,
@@ -64,5 +70,6 @@ export {
   Question,
   Result,
   Favorites,
+  Report,
   TokenContent,
 };

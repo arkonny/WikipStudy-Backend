@@ -69,10 +69,12 @@ const wikiPage = async (search: string): Promise<string> => {
     console.log('No data from Wikipedia');
     throw new GraphQLError('No data from Wikipedia');
   } else if (
-    dataPage.query.pages[0].extract.replace(/.* may refer to[\s|\S]*/g, '')
-      .length === 0
+    dataPage.query.pages[0].extract.replace(
+      /[\s|\S]* may (also )?refer to[\s|\S]*/g,
+      '',
+    ).length === 0
   ) {
-    console.log('Disambiguation page');
+    console.log('Disambiguation page:\n', dataPage.query.pages[0].extract);
     throw new GraphQLError('Disambiguation page');
   }
 

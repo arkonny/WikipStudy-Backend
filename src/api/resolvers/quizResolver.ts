@@ -73,17 +73,7 @@ const quizResolver = {
         console.log('Quiz not created');
         throw new GraphQLError('Quiz not created');
       }
-      try {
-        const quiz = await quizModel.findById(newQuiz._id).populate('owner');
-        if (!quiz) {
-          console.log('Quiz not found');
-          throw new GraphQLError('Quiz not found');
-        }
-        return quiz;
-      } catch (error) {
-        console.log('error', error);
-      }
-      return newQuiz;
+      return newQuiz.populate('owner');
     },
 
     updateQuiz: async (
@@ -97,29 +87,24 @@ const quizResolver = {
           extensions: {code: 'UNAUTHENTICATED'},
         });
       }
-      try {
-        const quizUser = await quizModel.findById(args.id).populate('owner');
-        if (!quizUser) {
-          console.log('Quiz not found');
-          throw new GraphQLError('Quiz not found');
-        } else if (quizUser.owner.id !== contextValue.userdata.user._id) {
-          console.log('User is not the owner of the quiz');
-          throw new GraphQLError('User is not the owner of the quiz');
-        }
-        const quiz = await quizModel
-          .findByIdAndUpdate(args.id, args.input, {
-            new: true,
-          })
-          .populate('owner');
-        if (!quiz) {
-          console.log('Quiz not updated');
-          throw new GraphQLError('Quiz not updated');
-        }
-        return quiz;
-      } catch (error) {
-        console.log('error', error);
+      const quizUser = await quizModel.findById(args.id).populate('owner');
+      if (!quizUser) {
+        console.log('Quiz not found');
+        throw new GraphQLError('Quiz not found');
+      } else if (quizUser.owner.id !== contextValue.userdata.user._id) {
+        console.log('User is not the owner of the quiz');
+        throw new GraphQLError('User is not the owner of the quiz');
       }
-      return args.input;
+      const quiz = await quizModel
+        .findByIdAndUpdate(args.id, args.input, {
+          new: true,
+        })
+        .populate('owner');
+      if (!quiz) {
+        console.log('Quiz not updated');
+        throw new GraphQLError('Quiz not updated');
+      }
+      return quiz;
     },
 
     generateQuiz: async (

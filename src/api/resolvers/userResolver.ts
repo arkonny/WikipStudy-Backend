@@ -32,9 +32,15 @@ const userResolver = {
       _args: undefined,
       context: MyContext,
     ) => {
+      if (!context.userdata) {
+        console.log('User not authenticated');
+        throw new GraphQLError('User not authenticated');
+      }
+      const user = context.userdata.user;
+      user.id = user._id;
       const response = {
         message: 'Token is valid',
-        user: context.userdata,
+        user,
       };
       return response;
     },

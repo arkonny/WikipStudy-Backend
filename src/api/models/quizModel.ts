@@ -33,7 +33,7 @@ const Question = new mongoose.Schema({
   },
   type: {
     type: String,
-    required: true,
+    required: false,
     enum: ['multiple', 'single'],
   },
   options: {

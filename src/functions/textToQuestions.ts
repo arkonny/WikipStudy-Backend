@@ -6,12 +6,10 @@ const nlpWink = winkNLP(model);
 const its = nlpWink.its;
 
 const clarifyText = (text: string): string => {
-  return (
-    text
-      .replace(/\n/g, ' ') // Remove new lines
-      //.replace(/([^a-zA-Z0-9\-_\s\p{Lu}\p{Ll}])/gu, ' $1 ') // Add spaces around punctuation (when using compromise)
-      .replace(/(\s)\s+/g, '$1') // Remove multiple spaces
-  );
+  return text
+    .replace(/\n/g, ' ') // Remove new lines
+    .replace(/([^a-zA-Z0-9\-_\s\p{Lu}\p{Ll}])/gu, ' $1 ') // Add spaces around punctuation (when using compromise)
+    .replace(/(\s)\s+/g, '$1'); // Remove multiple spaces
 };
 
 type Sentence = {
@@ -48,7 +46,7 @@ const textToQuestions = async (inputText: string): Promise<Question[]> => {
     const question: Question = {
       question: sentence.sentence.replace(
         regex,
-        '_(' + sentence.types[0] + ')_',
+        '_[' + sentence.types[0] + ']_',
       ),
       type: 'single',
       answers: [sentence.entities[0]],

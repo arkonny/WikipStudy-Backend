@@ -3,6 +3,7 @@ import quizModel from '../models/quizModel';
 import {Favorites} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
 import favoritesModel from '../models/favoritesModel';
+import {FavoritesOut} from '../../types/OutputTypes';
 
 const favoritesResolver = {
   Query: {
@@ -10,23 +11,22 @@ const favoritesResolver = {
       _parent: undefined,
       _args: undefined,
       context: MyContext,
-    ): Promise<Favorites> => {
+    ): Promise<FavoritesOut> => {
       if (!context.userdata) {
         console.log('User not authenticated');
         throw new GraphQLError('User not authenticated', {
           extensions: {code: 'UNAUTHENTICATED'},
         });
       }
-      const favorites = await favoritesModel
-        .findOne({
-          owner: context.userdata.user._id,
-        })
-        .populate('items');
+
+      const favorites = await favoritesModel.findOne({
+        owner: context.userdata.user._id,
+      });
       if (!favorites) {
         console.log('Favorites not found');
         throw new GraphQLError('Favorites not found');
       }
-      return favorites;
+      return favorites.populate('items');
     },
   },
 

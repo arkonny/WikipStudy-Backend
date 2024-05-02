@@ -6,6 +6,15 @@ type Quiz {
   filename: String
 }
 
+type QuizOut {
+  id: ID!
+  quiz_name: String!
+  questions: [Question!]!
+  owner: UserOutput!
+  filename: String
+  favorite: Boolean!
+}
+
 type Question {
   id: ID!
   question: String!
@@ -21,7 +30,7 @@ type QuizCard {
 }
 
 type Query {
-  quizById(id: ID!): Quiz
+  quizById(id: ID!): QuizOut
   quizResearch(search: String!): [QuizCard]
   quizzes: [QuizCard]
   quizzesByOwner(owner: ID!): [QuizCard]

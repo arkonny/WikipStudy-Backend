@@ -1,10 +1,12 @@
 import {GraphQLError} from 'graphql';
 import quizModel from '../models/quizModel';
-import {Quiz, QuizCard} from '../../types/DBTypes';
+import {Quiz} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
 import resultModel from '../models/resultModel';
 import wikiPage from '../../functions/wikiPage';
 import textToQuestions from '../../functions/textToQuestions';
+import favoritesModel from '../models/favoritesModel';
+import {QuizCard, QuizOut} from '../../types/OutputTypes';
 
 const quizResolver = {
   Query: {
@@ -12,7 +14,7 @@ const quizResolver = {
       _parent: undefined,
       args: {id: string},
       context: MyContext,
-    ): Promise<Quiz> => {
+    ): Promise<QuizOut> => {
       if (!context.userdata) {
         console.log('User not authenticated');
         throw new GraphQLError('User not authenticated', {
@@ -29,7 +31,23 @@ const quizResolver = {
           question.answers = [];
         });
       }
-      return quiz;
+      const favorites = await favoritesModel.findOne({
+        owner: context.userdata.user._id,
+      });
+      const quizOut: QuizOut = {
+        favorite: false,
+        id: quiz.id,
+        quiz_name: quiz.quiz_name,
+        owner: quiz.owner,
+        questions: quiz.questions,
+        filename: quiz.filename,
+      };
+      if (favorites && favorites.items.includes(quizOut.id)) {
+        quizOut.favorite = true;
+      }
+      console.log('Quiz Out :\n', quizOut, '\n');
+      console.log('Quiz :\n', quiz, '\n');
+      return quizOut;
     },
 
     quizResearch: async (

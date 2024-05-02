@@ -174,6 +174,7 @@ const quizResolver = {
         throw new GraphQLError('Quiz not deleted');
       }
       await resultModel.deleteMany({quiz: args.id});
+      await favoritesModel.updateMany({}, {$pull: {items: args.id}});
       return quiz;
     },
   },

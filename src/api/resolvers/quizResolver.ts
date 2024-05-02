@@ -130,9 +130,7 @@ const quizResolver = {
         owner: contextValue.userdata.user._id,
       });
 
-      const quiz = await newQuiz.save();
-
-      return quiz.populate('owner');
+      return newQuiz.populate('owner');
     },
 
     deleteQuiz: async (

@@ -45,8 +45,6 @@ const quizResolver = {
       if (favorites && favorites.items.includes(quizOut.id)) {
         quizOut.favorite = true;
       }
-      console.log('Quiz Out :\n', quizOut, '\n');
-      console.log('Quiz :\n', quiz, '\n');
       return quizOut;
     },
 

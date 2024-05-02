@@ -1,4 +1,5 @@
 import {Document, Types} from 'mongoose';
+import {LoginUser, UserOutput} from './OutputTypes';
 
 type User = Partial<Document> & {
   id: Types.ObjectId | string;
@@ -6,14 +7,6 @@ type User = Partial<Document> & {
   email: string;
   password: string;
 };
-
-type UserOutput = Omit<User, 'email' | 'password'>;
-
-type UserInput = Omit<User, 'id'>;
-
-type UserTest = Partial<User>;
-
-type LoginUser = Omit<User, 'password'>;
 
 type TokenContent = {
   token: string;
@@ -28,10 +21,6 @@ type Quiz = Partial<Document> & {
   owner: Types.ObjectId | UserOutput;
   filename: string | undefined;
 };
-
-type QuizCard = Omit<Quiz, 'questions' | 'owner'>;
-
-type QuizTest = Partial<Quiz>;
 
 // A question can be of different types
 type Question = {
@@ -49,7 +38,7 @@ type Result = {
 
 type Favorites = {
   owner: Types.ObjectId | UserOutput;
-  items: (Types.ObjectId | QuizCard)[];
+  items: Types.ObjectId[];
 };
 
 type Report = {
@@ -58,18 +47,4 @@ type Report = {
   message: string;
 };
 
-export {
-  User,
-  UserOutput,
-  UserInput,
-  UserTest,
-  LoginUser,
-  Quiz,
-  QuizCard,
-  QuizTest,
-  Question,
-  Result,
-  Favorites,
-  Report,
-  TokenContent,
-};
+export {User, Quiz, Question, Result, Favorites, Report, TokenContent};

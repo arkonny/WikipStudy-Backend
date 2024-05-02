@@ -1,4 +1,4 @@
-import {UserOutput} from './DBTypes';
+import {UserOutput} from './OutputTypes';
 
 type MessageResponse = {
   message: string;

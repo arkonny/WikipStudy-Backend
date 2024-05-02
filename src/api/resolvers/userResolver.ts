@@ -1,5 +1,4 @@
 import {GraphQLError} from 'graphql';
-import {LoginUser, UserInput, UserOutput} from '../../types/DBTypes';
 import fetchData from '../../functions/fetchData';
 import {
   LoginResponse,
@@ -10,6 +9,7 @@ import {MyContext} from '../../types/MyContext';
 import favoritesModel from '../models/favoritesModel';
 import quizModel from '../models/quizModel';
 import resultModel from '../models/resultModel';
+import {LoginUser, UserInput, UserOutput} from '../../types/OutputTypes';
 
 const userResolver = {
   Query: {

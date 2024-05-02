@@ -54,6 +54,10 @@ const favoritesResolver = {
         console.log('Quiz not found');
         throw new GraphQLError('Quiz not found');
       }
+      if (favorites.items.includes(newQuiz._id)) {
+        console.log('Quiz already in favorites');
+        throw new GraphQLError('Quiz already in favorites');
+      }
       favorites.items.push(newQuiz._id);
       await favorites.save();
       return favorites.populate('items');
@@ -70,17 +74,19 @@ const favoritesResolver = {
           extensions: {code: 'UNAUTHENTICATED'},
         });
       }
-      const favorites = await favoritesModel.findOne({
-        owner: context.userdata.user._id,
-      });
-      if (!favorites) {
-        console.log('Favorites not found');
-        throw new GraphQLError('Favorites not found');
-      }
+
       const newQuiz = await quizModel.findById(args.quizId);
       if (!newQuiz) {
         console.log('Quiz not found');
         throw new GraphQLError('Quiz not found');
+      }
+      const favorites = await favoritesModel.findOne({
+        owner: context.userdata.user._id,
+      });
+
+      if (!favorites) {
+        console.log('Favorites not found');
+        throw new GraphQLError('Favorites not found');
       }
       favorites.items = favorites.items.filter(
         (item) => item._id.toString() !== newQuiz._id.toString(),

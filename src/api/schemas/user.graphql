@@ -1,7 +1,7 @@
 type User {
   id: ID!
   user_name: String!
-  email: String!
+  email: String! @constraint(format: "email")
 }
 
 type UserOutput {
@@ -27,13 +27,13 @@ input Credentials {
 
 input UserInput {
   user_name: String!
-  email: String!
+  email: String! @constraint(format: "email")
   password: String!
 }
 
 input UserModify {
   user_name: String
-  email: String
+  email: String @constraint(format: "email")
   password: String
 }
 

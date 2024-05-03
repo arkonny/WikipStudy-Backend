@@ -28,7 +28,7 @@
     "express": "^4.18.2",
     "geojson": "^0.5.0",
     "graphql": "^16.8.1",
-    "graphql-constraint-directive": "^5.4.1",
+    "graphql-constraint-directive": "^5.4.3",
     "graphql-rate-limit": "^3.3.0",
     "graphql-shield": "^7.6.5",
     "graphql-tag": "^2.12.6",

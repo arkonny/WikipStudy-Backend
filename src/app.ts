@@ -19,6 +19,10 @@ import {applyMiddleware} from 'graphql-middleware';
 import {MyContext} from './types/MyContext';
 import {GraphQLError} from 'graphql';
 import helmet from 'helmet';
+import {
+  constraintDirective,
+  constraintDirectiveTypeDefs,
+} from 'graphql-constraint-directive';
 
 const app = express();
 
@@ -43,13 +47,14 @@ app.use(
       },
     });
 
-    const schema = applyMiddleware(
+    const schema_executable = constraintDirective()(
       makeExecutableSchema({
-        typeDefs,
+        typeDefs: [constraintDirectiveTypeDefs, typeDefs],
         resolvers,
       }),
-      permissions,
     );
+
+    const schema = applyMiddleware(schema_executable, permissions);
 
     const server = new ApolloServer<MyContext>({
       schema,

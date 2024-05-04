@@ -44,6 +44,8 @@ const quizResolver = {
       };
       if (favorites && favorites.items.includes(quizOut.id)) {
         quizOut.favorite = true;
+      } else {
+        quizOut.favorite = false;
       }
       return quizOut;
     },

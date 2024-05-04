@@ -1,39 +1,10 @@
 import {GraphQLError} from 'graphql';
-const wikiAPIURL = 'https://en.wikipedia.org/w/api.php';
-
-interface wikiAPIParameters {
-  search?: string;
-  action: string;
-  limit?: string;
-  namespace?: string;
-  format?: string;
-  titles?: string;
-  prop?: string;
-  exintro?: number;
-  exsentences?: string;
-  explaintext?: number;
-  formatversion?: string;
-  redirects?: number;
-}
-
-const wikiAPI = async (params: wikiAPIParameters): Promise<Response> => {
-  let url = wikiAPIURL + '?origin=*';
-  Object.keys(params).forEach((key: string) => {
-    url += `&${key}=${params[key as keyof typeof params]}`;
-  });
-
-  const response = await fetch(url);
-
-  if (!response) {
-    console.log('No response from Wikipedia');
-    throw new GraphQLError('No response from Wikipedia');
-  }
-
-  return response;
-};
+import wikiAPI from './wikiAPI';
 
 // First we need to search for the page, allowing the user to write a more general search (still quite specific though)
-const wikiPage = async (search: string): Promise<string> => {
+const wikiPage = async (
+  search: string,
+): Promise<{page: string; imageUrl: string}> => {
   const dataSearch = await (
     await wikiAPI({
       search,
@@ -78,7 +49,28 @@ const wikiPage = async (search: string): Promise<string> => {
     throw new GraphQLError('Disambiguation page');
   }
 
-  return dataPage.query.pages[0].extract as string;
+  const image = await (
+    await wikiAPI({
+      titles: title,
+      action: 'query',
+      prop: 'pageimages',
+      format: 'json',
+      formatversion: '2',
+      pithumbsize: '300',
+    })
+  ).json();
+
+  let imageUrl = '';
+  if (!image.query.pages[0].thumbnail) {
+    console.log('No image found');
+  } else {
+    imageUrl = image.query.pages[0].thumbnail.source as string;
+  }
+
+  return {
+    page: dataPage.query.pages[0].extract as string,
+    imageUrl,
+  };
 };
 
 export default wikiPage;

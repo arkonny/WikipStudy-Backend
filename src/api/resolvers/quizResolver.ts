@@ -7,6 +7,7 @@ import wikiPage from '../../functions/wikiPage';
 import textToQuestions from '../../functions/textToQuestions';
 import favoritesModel from '../models/favoritesModel';
 import {QuizCard, QuizOut} from '../../types/OutputTypes';
+import uploadImage from '../../functions/uploadImage';
 
 const quizResolver = {
   Query: {
@@ -137,16 +138,39 @@ const quizResolver = {
         });
       }
 
-      const page = await wikiPage(args.search);
+      console.log('Search :\n', args.search, '\n');
+      const {page, imageUrl} = await wikiPage(args.search);
       console.log('Page :\n', page, '\n');
+      console.log('Image :\n', imageUrl, '\n');
       const questions = await textToQuestions(page);
       console.log('Questions :\n', questions, '\n');
 
-      const newQuiz = new quizModel({
-        quiz_name: args.search,
-        questions: questions,
-        owner: contextValue.userdata.user._id,
-      });
+      let input;
+      if (imageUrl !== '') {
+        const filename = await uploadImage(
+          imageUrl,
+          contextValue.userdata.token,
+        );
+        input = {
+          quiz_name: args.search,
+          questions: questions,
+          owner: contextValue.userdata.user._id,
+          filename: filename,
+        };
+      } else {
+        input = {
+          quiz_name: args.search,
+          questions: questions,
+          owner: contextValue.userdata.user._id,
+        };
+      }
+
+      const newQuiz = await quizModel.create(input);
+
+      if (!newQuiz) {
+        console.log('Quiz not created');
+        throw new GraphQLError('Quiz not created');
+      }
 
       return newQuiz.populate('owner');
     },

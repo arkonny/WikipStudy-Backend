@@ -9,6 +9,7 @@ import favoritesModel from '../models/favoritesModel';
 import {QuizCard, QuizInput, QuizOut} from '../../types/OutputTypes';
 import uploadImage from '../../functions/uploadImage';
 import {sanitizeQuiz} from '../../functions/sanitizer';
+import deleteImage from '../../functions/deleteImage';
 
 const quizResolver = {
   Query: {
@@ -206,6 +207,9 @@ const quizResolver = {
       }
       await resultModel.deleteMany({quiz: args.id});
       await favoritesModel.updateMany({}, {$pull: {items: args.id}});
+      if (quiz.filename) {
+        await deleteImage(quiz.filename, contextValue.userdata.token);
+      }
       return quiz;
     },
   },

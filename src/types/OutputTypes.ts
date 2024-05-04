@@ -8,6 +8,8 @@ type UserTest = Partial<User>;
 
 type LoginUser = Omit<User, 'password'>;
 
+type QuizInput = Omit<Quiz, 'id'>;
+
 type QuizOut = Quiz & {favorite: boolean};
 
 type QuizCard = Omit<Quiz, 'questions' | 'owner'>;
@@ -24,6 +26,7 @@ export {
   UserInput,
   UserTest,
   LoginUser,
+  QuizInput,
   QuizOut,
   QuizCard,
   QuizTest,

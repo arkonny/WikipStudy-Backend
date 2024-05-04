@@ -6,8 +6,9 @@ import resultModel from '../models/resultModel';
 import wikiPage from '../../functions/wikiPage';
 import textToQuestions from '../../functions/textToQuestions';
 import favoritesModel from '../models/favoritesModel';
-import {QuizCard, QuizOut} from '../../types/OutputTypes';
+import {QuizCard, QuizInput, QuizOut} from '../../types/OutputTypes';
 import uploadImage from '../../functions/uploadImage';
+import {sanitizeQuiz} from '../../functions/sanitizer';
 
 const quizResolver = {
   Query: {
@@ -77,9 +78,10 @@ const quizResolver = {
   Mutation: {
     createQuiz: async (
       _parent: undefined,
-      args: {input: Omit<Quiz, 'id'>},
+      args: {input: QuizInput},
       context: MyContext,
     ): Promise<Quiz> => {
+      const input = sanitizeQuiz(args.input);
       if (!context.userdata) {
         console.log('User not authenticated');
         throw new GraphQLError('User not authenticated', {
@@ -87,7 +89,7 @@ const quizResolver = {
         });
       }
       args.input.owner = context.userdata.user._id;
-      const newQuiz = await quizModel.create(args.input);
+      const newQuiz = await quizModel.create(input);
       if (!newQuiz) {
         console.log('Quiz not created');
         throw new GraphQLError('Quiz not created');
@@ -97,9 +99,10 @@ const quizResolver = {
 
     updateQuiz: async (
       _parent: undefined,
-      args: {id: string; input: Quiz},
+      args: {id: string; input: QuizInput},
       contextValue: MyContext,
     ): Promise<Quiz> => {
+      const input = sanitizeQuiz(args.input);
       if (!contextValue.userdata) {
         console.log('User not authenticated');
         throw new GraphQLError('User not authenticated', {
@@ -115,7 +118,7 @@ const quizResolver = {
         throw new GraphQLError('User is not the owner of the quiz');
       }
       const quiz = await quizModel
-        .findByIdAndUpdate(args.id, args.input, {
+        .findByIdAndUpdate(args.id, input, {
           new: true,
         })
         .populate('owner');
@@ -162,9 +165,11 @@ const quizResolver = {
           quiz_name: args.search,
           questions: questions,
           owner: contextValue.userdata.user._id,
+          filename: undefined,
         };
       }
 
+      input = sanitizeQuiz(input);
       const newQuiz = await quizModel.create(input);
 
       if (!newQuiz) {

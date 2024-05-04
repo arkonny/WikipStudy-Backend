@@ -10,6 +10,8 @@ import favoritesModel from '../models/favoritesModel';
 import quizModel from '../models/quizModel';
 import resultModel from '../models/resultModel';
 import {LoginUser, UserInput, UserOutput} from '../../types/OutputTypes';
+import {sanitizeUser} from '../../functions/sanitizer';
+import {escape} from 'validator';
 
 const userResolver = {
   Query: {
@@ -51,6 +53,10 @@ const userResolver = {
       _parent: undefined,
       args: {credentials: {username: string; password: string}},
     ): Promise<LoginResponse> => {
+      const credentials = {
+        username: escape(args.credentials.username),
+        password: args.credentials.password,
+      };
       if (!process.env.AUTH_URL) {
         throw new GraphQLError('Auth URL not set in .env file');
       }
@@ -59,7 +65,7 @@ const userResolver = {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(args.credentials),
+        body: JSON.stringify(credentials),
       };
       const LoginResponse = await fetchData<LoginResponse>(
         process.env.AUTH_URL + '/auth/login',
@@ -73,6 +79,7 @@ const userResolver = {
       _parent: undefined,
       args: {user: UserInput},
     ): Promise<UserResponse> => {
+      const user = sanitizeUser(args.user);
       if (!process.env.AUTH_URL) {
         throw new GraphQLError('Auth URL not set in .env file');
       }
@@ -81,7 +88,7 @@ const userResolver = {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(args.user),
+        body: JSON.stringify(user),
       };
       const registerResponse = await fetchData<
         MessageResponse & {data: LoginUser}
@@ -99,6 +106,7 @@ const userResolver = {
       args: {user: UserInput},
       context: MyContext,
     ): Promise<UserResponse> => {
+      const user = sanitizeUser(args.user);
       if (!process.env.AUTH_URL) {
         throw new GraphQLError('Auth URL not set in .env file');
       }
@@ -111,7 +119,7 @@ const userResolver = {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + context.userdata.token,
         },
-        body: JSON.stringify(args.user),
+        body: JSON.stringify(user),
       };
       console.log('options', options);
       const response = await fetchData<MessageResponse & {data: LoginUser}>(

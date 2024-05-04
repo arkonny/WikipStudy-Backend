@@ -9,7 +9,7 @@ type Query {
 }
 
 input AnswerInput {
-  quizId: ID!
+  quizId: ID! @constraint(format: "uuid")
   answers: [String]!
 }
 

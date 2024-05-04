@@ -37,14 +37,14 @@ type Query {
 }
 
 input QuizInput {
-  quiz_name: String!
-  filename: String
+  quiz_name: String! @constraint(minLength: 3, maxLength: 50)
+  filename: String @constraint(minLength: 3, maxLength: 50)
   questions: [QuestionInput]!
 }
 
 input QuestionInput {
   question: String!
-  type: String
+  type: String @constraint(pattern: "^(multiple|single)$")
   options: [String]
   answers: [String]!
 }

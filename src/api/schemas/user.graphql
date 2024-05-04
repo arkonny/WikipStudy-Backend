@@ -21,20 +21,20 @@ type UserResponse {
 }
 
 input Credentials {
-  username: String!
-  password: String!
+  username: String! @constraint(format: "email", minLength: 5, maxLength: 255)
+  password: String! @constraint(minLength: 4, maxLength: 255)
 }
 
 input UserInput {
-  user_name: String!
-  email: String! @constraint(format: "email")
-  password: String!
+  user_name: String! @constraint(minLength: 3, maxLength: 20)
+  email: String! @constraint(format: "email", minLength: 5, maxLength: 255)
+  password: String! @constraint(minLength: 4, maxLength: 255)
 }
 
 input UserModify {
-  user_name: String
-  email: String @constraint(format: "email")
-  password: String
+  user_name: String @constraint(minLength: 3, maxLength: 20)
+  email: String @constraint(format: "email", minLength: 5, maxLength: 255)
+  password: String @constraint(minLength: 4, maxLength: 255)
 }
 
 type Query {

@@ -12,6 +12,7 @@ import resultModel from '../models/resultModel';
 import {LoginUser, UserInput, UserOutput} from '../../types/OutputTypes';
 import {sanitizeUser} from '../../functions/sanitizer';
 import {escape} from 'validator';
+import deleteQuiz from '../../functions/deleteQuiz';
 
 const userResolver = {
   Query: {
@@ -142,11 +143,12 @@ const userResolver = {
         throw new GraphQLError('User not authenticated');
       }
       const user = context.userdata.user;
+      const token = context.userdata.token;
       const options = {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + context.userdata.token,
+          Authorization: 'Bearer ' + token,
         },
       };
       const message = await fetchData<MessageResponse>(
@@ -156,7 +158,10 @@ const userResolver = {
       // delete the user's favorites, quizzes and results
       if (message.message === 'User deleted') {
         await favoritesModel.deleteOne({owner: user._id});
-        await quizModel.deleteMany({owner: user._id});
+        const quizzes = await quizModel.find({owner: user._id});
+        quizzes.forEach(async (quiz) => {
+          await deleteQuiz(quiz.id, token);
+        });
         await resultModel.deleteMany({owner: user._id});
       }
       user.id = user._id;

@@ -2,14 +2,13 @@ import {GraphQLError} from 'graphql';
 import quizModel from '../models/quizModel';
 import {Quiz} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
-import resultModel from '../models/resultModel';
 import wikiPage from '../../functions/wikiPage';
 import textToQuestions from '../../functions/textToQuestions';
 import favoritesModel from '../models/favoritesModel';
 import {QuizCard, QuizInput, QuizOut} from '../../types/OutputTypes';
 import uploadImage from '../../functions/uploadImage';
 import {sanitizeQuiz} from '../../functions/sanitizer';
-import deleteImage from '../../functions/deleteImage';
+import deleteQuiz from '../../functions/deleteQuiz';
 
 const quizResolver = {
   Query: {
@@ -200,16 +199,7 @@ const quizResolver = {
         console.log('User is not the owner of the quiz');
         throw new GraphQLError('User is not the owner of the quiz');
       }
-      const quiz = await quizModel.findByIdAndDelete(args.id).populate('owner');
-      if (!quiz) {
-        console.log('Quiz not deleted');
-        throw new GraphQLError('Quiz not deleted');
-      }
-      await resultModel.deleteMany({quiz: args.id});
-      await favoritesModel.updateMany({}, {$pull: {items: args.id}});
-      if (quiz.filename) {
-        await deleteImage(quiz.filename, contextValue.userdata.token);
-      }
+      const quiz = await deleteQuiz(args.id, contextValue.userdata.token);
       return quiz;
     },
   },

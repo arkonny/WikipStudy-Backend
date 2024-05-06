@@ -1,4 +1,3 @@
-import {GraphQLError} from 'graphql';
 import quizModel from '../models/quizModel';
 import {Quiz} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
@@ -9,32 +8,26 @@ import {QuizCard, QuizInput, QuizOut} from '../../types/OutputTypes';
 import uploadImage from '../../functions/uploadImage';
 import {sanitizeQuiz} from '../../functions/sanitizer';
 import deleteQuiz from '../../functions/deleteQuiz';
+import {errors} from '../../functions/errors';
 
 const quizResolver = {
   Query: {
     quizById: async (
       _parent: undefined,
       args: {id: string},
-      context: MyContext,
+      contextValue: MyContext,
     ): Promise<QuizOut> => {
-      if (!context.userdata) {
-        console.log('User not authenticated');
-        throw new GraphQLError('User not authenticated', {
-          extensions: {code: 'UNAUTHENTICATED'},
-        });
-      }
+      if (!contextValue.userdata) throw errors.authUser;
       const quiz = await quizModel.findById(args.id).populate('owner');
-      if (!quiz) {
-        console.log('Quiz not found');
-        throw new GraphQLError('Quiz not found');
-      }
-      if (quiz.owner.id !== context.userdata.user._id) {
+      if (!quiz) throw errors.notFound;
+
+      if (quiz.owner.id !== contextValue.userdata.user._id) {
         quiz.questions.forEach((question) => {
           question.answers = [];
         });
       }
       const favorites = await favoritesModel.findOne({
-        owner: context.userdata.user._id,
+        owner: contextValue.userdata.user._id,
       });
       const quizOut: QuizOut = {
         favorite: false,
@@ -79,21 +72,15 @@ const quizResolver = {
     createQuiz: async (
       _parent: undefined,
       args: {input: QuizInput},
-      context: MyContext,
+      contextValue: MyContext,
     ): Promise<Quiz> => {
       const input = sanitizeQuiz(args.input);
-      if (!context.userdata) {
-        console.log('User not authenticated');
-        throw new GraphQLError('User not authenticated', {
-          extensions: {code: 'UNAUTHENTICATED'},
-        });
-      }
-      input.owner = context.userdata.user._id;
+      if (!contextValue.userdata) throw errors.authUser;
+
+      input.owner = contextValue.userdata.user._id;
       const newQuiz = await quizModel.create(input);
-      if (!newQuiz) {
-        console.log('Quiz not created');
-        throw new GraphQLError('Quiz not created');
-      }
+      if (!newQuiz) throw errors.notCreated;
+
       return newQuiz.populate('owner');
     },
 
@@ -103,29 +90,19 @@ const quizResolver = {
       contextValue: MyContext,
     ): Promise<Quiz> => {
       const input = sanitizeQuiz(args.input);
-      if (!contextValue.userdata) {
-        console.log('User not authenticated');
-        throw new GraphQLError('User not authenticated', {
-          extensions: {code: 'UNAUTHENTICATED'},
-        });
-      }
+      if (!contextValue.userdata) throw errors.authUser;
       const quizUser = await quizModel.findById(args.id).populate('owner');
-      if (!quizUser) {
-        console.log('Quiz not found');
-        throw new GraphQLError('Quiz not found');
-      } else if (quizUser.owner.id !== contextValue.userdata.user._id) {
-        console.log('User is not the owner of the quiz');
-        throw new GraphQLError('User is not the owner of the quiz');
-      }
+      if (!quizUser) throw errors.notFound;
+      else if (quizUser.owner.id !== contextValue.userdata.user._id)
+        throw errors.userNotOwner;
+
       const quiz = await quizModel
         .findByIdAndUpdate(args.id, input, {
           new: true,
         })
         .populate('owner');
-      if (!quiz) {
-        console.log('Quiz not updated');
-        throw new GraphQLError('Quiz not updated');
-      }
+      if (!quiz) throw errors.notCreated;
+
       return quiz;
     },
 
@@ -134,12 +111,7 @@ const quizResolver = {
       args: {search: string},
       contextValue: MyContext,
     ): Promise<Quiz> => {
-      if (!contextValue.userdata) {
-        console.log('User not authenticated');
-        throw new GraphQLError('User not authenticated', {
-          extensions: {code: 'UNAUTHENTICATED'},
-        });
-      }
+      if (!contextValue.userdata) throw errors.authUser;
 
       console.log('Search :\n', args.search, '\n');
       const {page, imageUrl} = await wikiPage(args.search);
@@ -172,10 +144,7 @@ const quizResolver = {
       input = sanitizeQuiz(input);
       const newQuiz = await quizModel.create(input);
 
-      if (!newQuiz) {
-        console.log('Quiz not created');
-        throw new GraphQLError('Quiz not created');
-      }
+      if (!newQuiz) throw errors.notCreated;
 
       return newQuiz.populate('owner');
     },
@@ -185,20 +154,13 @@ const quizResolver = {
       args: {id: string},
       contextValue: MyContext,
     ): Promise<Quiz> => {
-      if (!contextValue.userdata) {
-        console.log('User not authenticated');
-        throw new GraphQLError('User not authenticated', {
-          extensions: {code: 'UNAUTHENTICATED'},
-        });
-      }
+      if (!contextValue.userdata) throw errors.authUser;
+
       const quizUser = await quizModel.findById(args.id).populate('owner');
-      if (!quizUser) {
-        console.log('Quiz not found');
-        throw new GraphQLError('Quiz not found');
-      } else if (quizUser.owner.id !== contextValue.userdata.user._id) {
-        console.log('User is not the owner of the quiz');
-        throw new GraphQLError('User is not the owner of the quiz');
-      }
+      if (!quizUser) throw errors.notFound;
+      else if (quizUser.owner.id !== contextValue.userdata.user._id)
+        throw errors.userNotOwner;
+
       const quiz = await deleteQuiz(args.id, contextValue.userdata.token);
       return quiz;
     },

@@ -1,4 +1,3 @@
-import {GraphQLError} from 'graphql';
 import fetchData from '../../functions/fetchData';
 import {
   LoginResponse,
@@ -13,6 +12,7 @@ import {LoginUser, UserInput, UserOutput} from '../../types/OutputTypes';
 import {sanitizeUser} from '../../functions/sanitizer';
 import {escape} from 'validator';
 import deleteQuiz from '../../functions/deleteQuiz';
+import {errors} from '../../functions/errors';
 
 const userResolver = {
   Query: {
@@ -20,9 +20,7 @@ const userResolver = {
       _parent: undefined,
       args: {id: string},
     ): Promise<UserOutput> => {
-      if (!process.env.AUTH_URL) {
-        throw new GraphQLError('Auth URL not set in .env file');
-      }
+      if (!process.env.AUTH_URL) throw errors.envNotSet;
       const user = await fetchData<UserOutput>(
         process.env.AUTH_URL + '/users/' + args.id,
       );
@@ -35,10 +33,7 @@ const userResolver = {
       _args: undefined,
       context: MyContext,
     ) => {
-      if (!context.userdata) {
-        console.log('User not authenticated');
-        throw new GraphQLError('User not authenticated');
-      }
+      if (!context.userdata) throw errors.authUser;
       const user = context.userdata.user;
       user.id = user._id;
       const response = {
@@ -58,9 +53,7 @@ const userResolver = {
         username: escape(args.credentials.username),
         password: args.credentials.password,
       };
-      if (!process.env.AUTH_URL) {
-        throw new GraphQLError('Auth URL not set in .env file');
-      }
+      if (!process.env.AUTH_URL) throw errors.envNotSet;
       const options = {
         method: 'POST',
         headers: {
@@ -81,9 +74,7 @@ const userResolver = {
       args: {user: UserInput},
     ): Promise<UserResponse> => {
       const user = sanitizeUser(args.user);
-      if (!process.env.AUTH_URL) {
-        throw new GraphQLError('Auth URL not set in .env file');
-      }
+      if (!process.env.AUTH_URL) throw errors.envNotSet;
       const options = {
         method: 'POST',
         headers: {
@@ -108,12 +99,8 @@ const userResolver = {
       context: MyContext,
     ): Promise<UserResponse> => {
       const user = sanitizeUser(args.user);
-      if (!process.env.AUTH_URL) {
-        throw new GraphQLError('Auth URL not set in .env file');
-      }
-      if (!context.userdata) {
-        throw new GraphQLError('User not authenticated');
-      }
+      if (!process.env.AUTH_URL) throw errors.envNotSet;
+      if (!context.userdata) throw errors.authUser;
       const options = {
         method: 'PUT',
         headers: {
@@ -136,12 +123,8 @@ const userResolver = {
       _args: undefined,
       context: MyContext,
     ): Promise<UserResponse> => {
-      if (!process.env.AUTH_URL) {
-        throw new GraphQLError('Auth URL not set in .env file');
-      }
-      if (!context.userdata) {
-        throw new GraphQLError('User not authenticated');
-      }
+      if (!process.env.AUTH_URL) throw errors.envNotSet;
+      if (!context.userdata) throw errors.authUser;
       const user = context.userdata.user;
       const token = context.userdata.token;
       const options = {

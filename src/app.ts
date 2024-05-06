@@ -74,7 +74,14 @@ app.use(
       formatError: (formattedError, error) => {
         console.log('error:', error);
         console.log('formattederror:', formattedError);
-        return formattedError;
+
+        if (process.env.NODE_ENV === 'development') {
+          return formattedError;
+        } else if (formattedError.extensions?.code !== 'DEV_ERROR') {
+          return formattedError;
+        }
+
+        return new GraphQLError('Internal server error');
       },
     });
     await server.start();

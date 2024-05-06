@@ -1,12 +1,12 @@
 import {GraphQLError} from 'graphql';
-import wikiAPI from './wikiAPI';
+import wikiAPICall from './wikiAPICall';
 
 // First we need to search for the page, allowing the user to write a more general search (still quite specific though)
 const wikiPage = async (
   search: string,
 ): Promise<{page: string; imageUrl: string}> => {
   const dataSearch = await (
-    await wikiAPI({
+    await wikiAPICall({
       search,
       action: 'opensearch',
       limit: '1',
@@ -24,7 +24,7 @@ const wikiPage = async (
 
   // Now we need to get the page content
   const dataPage = await (
-    await wikiAPI({
+    await wikiAPICall({
       titles: title,
       action: 'query',
       prop: 'extracts',
@@ -50,7 +50,7 @@ const wikiPage = async (
   }
 
   const image = await (
-    await wikiAPI({
+    await wikiAPICall({
       titles: title,
       action: 'query',
       prop: 'pageimages',

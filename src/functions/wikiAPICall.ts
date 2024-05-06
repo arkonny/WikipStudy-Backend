@@ -18,7 +18,7 @@ interface wikiAPIParameters {
 
 const wikiAPIURL = 'https://en.wikipedia.org/w/api.php';
 
-const wikiAPI = async (params: wikiAPIParameters): Promise<Response> => {
+const wikiAPICall = async (params: wikiAPIParameters): Promise<Response> => {
   let url = wikiAPIURL + '?origin=*';
   Object.keys(params).forEach((key: string) => {
     url += `&${key}=${params[key as keyof typeof params]}`;
@@ -34,4 +34,4 @@ const wikiAPI = async (params: wikiAPIParameters): Promise<Response> => {
   return response;
 };
 
-export default wikiAPI;
+export default wikiAPICall;

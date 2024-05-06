@@ -88,7 +88,7 @@ const quizResolver = {
           extensions: {code: 'UNAUTHENTICATED'},
         });
       }
-      args.input.owner = context.userdata.user._id;
+      input.owner = context.userdata.user._id;
       const newQuiz = await quizModel.create(input);
       if (!newQuiz) {
         console.log('Quiz not created');

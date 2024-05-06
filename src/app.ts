@@ -35,6 +35,7 @@ app.use(
 
 (async () => {
   try {
+    /*
     // TODO Create a rate limit rule instance (not WSK2 course)
     const rateLimitRule = createRateLimitRule({
       identifyContext: (ctx) => ctx.id,
@@ -46,6 +47,7 @@ app.use(
         login: rateLimitRule({window: '1m', max: 5}),
       },
     });
+    */
 
     const schema_executable = constraintDirective()(
       makeExecutableSchema({
@@ -54,7 +56,9 @@ app.use(
       }),
     );
 
-    const schema = applyMiddleware(schema_executable, permissions);
+    // /!\ For when shield is fixed /!\
+    //const schema = applyMiddleware(schema_executable, permissions);
+    const schema = applyMiddleware(schema_executable);
 
     const server = new ApolloServer<MyContext>({
       schema,
@@ -67,6 +71,11 @@ app.use(
           : ApolloServerPluginLandingPageLocalDefault(),
       ],
       includeStacktraceInErrorResponses: false,
+      formatError: (formattedError, error) => {
+        console.log('error:', error);
+        console.log('formattederror:', formattedError);
+        return formattedError;
+      },
     });
     await server.start();
 

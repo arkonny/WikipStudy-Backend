@@ -18,6 +18,21 @@ type Sentence = {
   types: string[];
 };
 
+const sentenceToQuestion = (sentence: Sentence): Question => {
+  const regex = new RegExp(sentence.entities[0]);
+  const replacement = sentence.entities[0]
+    .replace(/[a-zA-Z]/g, 'x')
+    .replace(/[0-9]/g, '#');
+  return {
+    question: sentence.sentence.replace(
+      regex,
+      '[' + replacement + '] (' + sentence.types[0] + ')',
+    ),
+    type: 'single',
+    answers: [sentence.entities[0]],
+  };
+};
+
 const textToQuestions = async (inputText: string): Promise<Question[]> => {
   const text = clarifyText(inputText);
   const doc = nlpWink.readDoc(text);
@@ -42,15 +57,7 @@ const textToQuestions = async (inputText: string): Promise<Question[]> => {
   const questions: Question[] = [];
 
   sentencesEntitiesWink.forEach((sentence: Sentence) => {
-    const regex = new RegExp(sentence.entities[0]);
-    const question: Question = {
-      question: sentence.sentence.replace(
-        regex,
-        '_[' + sentence.types[0] + ']_',
-      ),
-      type: 'single',
-      answers: [sentence.entities[0]],
-    };
+    const question = sentenceToQuestion(sentence);
     questions.push(question);
   });
 

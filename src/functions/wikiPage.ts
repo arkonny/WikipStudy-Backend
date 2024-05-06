@@ -37,8 +37,8 @@ const wikiPage = async (
   ).json();
 
   if (!dataPage.query.pages || dataPage.query.pages[0].extract.length === 0) {
-    console.log('No data from Wikipedia');
-    throw new GraphQLError('No data from Wikipedia');
+    console.log('No data from Wikipedia on second call');
+    throw new GraphQLError('No data from Wikipedia on second call');
   } else if (
     dataPage.query.pages[0].extract.replace(
       /[\s|\S]* may (also )?refer to[\s|\S]*/g,

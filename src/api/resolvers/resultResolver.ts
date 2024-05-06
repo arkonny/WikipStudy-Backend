@@ -3,6 +3,7 @@ import quizModel from '../models/quizModel';
 import resultModel from '../models/resultModel';
 import {Result} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
+import calculateResult from '../../functions/calculateResult';
 
 const resultResolver = {
   Query: {
@@ -42,12 +43,7 @@ const resultResolver = {
         throw new GraphQLError('Quiz not found');
       }
 
-      let score = 0;
-      for (let i = 0; i < quiz.questions.length; i++) {
-        if (quiz.questions[i].answers[0].toString() === args.input.answers[i]) {
-          score++;
-        }
-      }
+      const score = calculateResult(quiz.questions, args.input.answers);
 
       const result = await resultModel.create({
         quiz: args.input.quizId,

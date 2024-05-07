@@ -27,6 +27,7 @@ import {
   generateQuiz,
 } from './quizFunctions';
 import {favoritesAdd, favoritesRemove, favoritesGet} from './favoriteFunctions';
+import {reportAdd} from './reportFunctions';
 
 describe('Testing graphql api', () => {
   beforeAll(async () => {
@@ -257,6 +258,19 @@ describe('Testing graphql api', () => {
   // test favorite remove
   it('should remove favorite', async () => {
     await favoritesRemove(app, quizData2.id!, userData.token!);
+  });
+
+  /*
+   * Report tests
+   */
+  // test report add
+  it('should add report', async () => {
+    await reportAdd(
+      app,
+      quizData2.id!,
+      'This is a test report',
+      userData.token!,
+    );
   });
 
   /*

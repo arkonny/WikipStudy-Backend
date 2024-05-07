@@ -30,6 +30,7 @@ const postFile = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const uploadMessageResponse = response.body;
           expect(uploadMessageResponse).toHaveProperty('message');
           expect(uploadMessageResponse).toHaveProperty('data');
@@ -69,6 +70,7 @@ const quizResearch = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const quizzes = response.body.data.quizResearch;
           quizzes.forEach((quiz: QuizTest) => {
             expect(quiz).toHaveProperty('id');
@@ -100,6 +102,7 @@ const wrongQuizResearch = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const quizzes = response.body.data.quizResearch;
           expect(quizzes).toBe([]);
           resolve(quizzes);
@@ -147,6 +150,7 @@ const createQuiz = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const quiz = vars.input;
           const createdQuiz = response.body.data.createQuiz;
           expect(createdQuiz.quiz_name).toBe(quiz.quiz_name);
@@ -199,6 +203,7 @@ const generateQuiz = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const quiz = response.body.data.generateQuiz;
           expect(quiz).toHaveProperty('id');
           expect(quiz).toHaveProperty('quiz_name');
@@ -253,6 +258,7 @@ const quizById = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const quiz = response.body.data.quizById;
           expect(quiz).toHaveProperty('id');
           expect(quiz.id).toBe(id);
@@ -335,6 +341,7 @@ const updateQuiz = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const quiz = vars.input;
           const updatedQuiz = response.body.data.updateQuiz;
           expect(updatedQuiz.quiz_name).toBe(quiz.quiz_name);
@@ -413,6 +420,7 @@ const deleteQuiz = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const deletedQuiz = response.body.data.deleteQuiz;
           expect(deletedQuiz.id).toBe(id);
           resolve(deletedQuiz);
@@ -476,6 +484,7 @@ const quizzesByOwner = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const quizzes = response.body.data.quizzesByOwner;
           quizzes.forEach((quiz: QuizTest) => {
             expect(quiz).toHaveProperty('id');

@@ -35,6 +35,7 @@ const favoritesAdd = async (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const favorites = response.body.data.favoritesAdd;
           expect(favorites).toHaveProperty('owner');
           expect(favorites).toHaveProperty('items');
@@ -78,6 +79,7 @@ const favoritesRemove = async (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const favorites = response.body.data.favoritesRemove;
           expect(favorites).toHaveProperty('owner');
           expect(favorites).toHaveProperty('items');
@@ -117,6 +119,7 @@ const favoritesGet = async (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const favorites = response.body.data.favoritesGet;
           expect(favorites).toHaveProperty('owner');
           expect(favorites).toHaveProperty('items');

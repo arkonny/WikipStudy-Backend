@@ -25,13 +25,11 @@ const sanitizeQuiz = (quiz: QuizInput): QuizInput => {
 };
 
 const sanitizeUser = (user: UserInput): UserInput => {
-  console.log(user);
   const input = {
     user_name: escape(user.user_name),
     email: user.email,
     password: user.password,
   };
-  console.log(input);
   return input;
 };
 

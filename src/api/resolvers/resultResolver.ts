@@ -1,8 +1,8 @@
-import {GraphQLError} from 'graphql';
 import quizModel from '../models/quizModel';
 import resultModel from '../models/resultModel';
 import {Result} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
+import {errors} from '../../functions/errors';
 import calculateResult from '../../functions/calculateResult';
 
 const resultResolver = {
@@ -12,12 +12,7 @@ const resultResolver = {
       args: {quizId: string},
       context: MyContext,
     ): Promise<Result[]> => {
-      if (!context.userdata) {
-        console.log('User not authenticated');
-        throw new GraphQLError('User not authenticated', {
-          extensions: {code: 'UNAUTHENTICATED'},
-        });
-      }
+      if (!context.userdata) throw errors.authUser;
       return await resultModel.find({
         quiz: args.quizId,
         owner: context.userdata.user._id,
@@ -30,17 +25,13 @@ const resultResolver = {
       args: {input: {quizId: string; answers: string[]}},
       context: MyContext,
     ): Promise<Result> => {
-      if (!context.userdata) {
-        console.log('User not authenticated');
-        throw new GraphQLError('User not authenticated', {
-          extensions: {code: 'UNAUTHENTICATED'},
-        });
-      }
+      if (!context.userdata) throw errors.authUser;
 
       const quiz = await quizModel.findById(args.input.quizId);
-      if (!quiz) {
-        console.log('Quiz not found');
-        throw new GraphQLError('Quiz not found');
+      if (!quiz) throw errors.notFound;
+
+      if (quiz.questions.length !== args.input.answers.length) {
+        throw errors.wrongInput;
       }
 
       const score = calculateResult(quiz.questions, args.input.answers);
@@ -51,12 +42,7 @@ const resultResolver = {
         score,
       });
 
-      if (!result) {
-        console.log('Result not created');
-        throw new GraphQLError('Result not created');
-      }
-
-      console.log('result', result);
+      if (!result) throw errors.notCreated;
       return result;
     },
   },

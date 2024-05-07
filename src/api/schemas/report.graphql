@@ -1,6 +1,6 @@
 type Report {
-  target: ID! @constraint(format: "uuid")
-  source: ID! @constraint(format: "uuid")
+  target: ID!
+  source: ID!
   message: String
 }
 

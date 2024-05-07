@@ -160,6 +160,58 @@ const createQuiz = (
   });
 };
 
+const generateQuizQuery = `mutation GenerateQuiz($search: String!) {
+  generateQuiz(search: $search) {
+    id
+    quiz_name
+    questions {
+      id
+      question
+      type
+      options
+      answers
+    }
+    owner {
+      id
+      user_name
+    }
+    filename
+  }
+}`;
+
+const generateQuiz = (
+  url: string | Application,
+  search: string,
+  token: string,
+): Promise<QuizTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: generateQuizQuery,
+        variables: {
+          search,
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const quiz = response.body.data.generateQuiz;
+          expect(quiz).toHaveProperty('id');
+          expect(quiz).toHaveProperty('quiz_name');
+          expect(quiz).toHaveProperty('questions');
+          expect(quiz).toHaveProperty('owner');
+          expect(quiz.owner).toHaveProperty('id');
+          expect(quiz.owner).toHaveProperty('user_name');
+          resolve(quiz);
+        }
+      });
+  });
+};
+
 // add test for graphql query
 const quizByIdQuery = `query QuizById($id: ID!) {
   quizById(id: $id) {
@@ -440,6 +492,7 @@ export {
   quizResearch,
   wrongQuizResearch,
   createQuiz,
+  generateQuiz,
   quizById,
   wrongQuizById,
   updateQuiz,

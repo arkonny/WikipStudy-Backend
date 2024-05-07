@@ -24,7 +24,9 @@ import {
   wrongDeleteQuiz,
   quizzesByOwner,
   wrongQuizById,
+  generateQuiz,
 } from './quizFunctions';
+import {favoritesAdd, favoritesRemove, favoritesGet} from './favoriteFunctions';
 
 describe('Testing graphql api', () => {
   beforeAll(async () => {
@@ -77,23 +79,6 @@ describe('Testing graphql api', () => {
         question: 'What is the capital of Sweden?',
         type: 'single',
         answers: ['Stockholm'],
-      },
-    ],
-    filename: undefined,
-  };
-
-  const testQuiz2: QuizTest = {
-    quiz_name: 'Test Quiz ' + randomstring.generate(7),
-    questions: [
-      {
-        question: 'What is the capital of France?',
-        type: 'single',
-        answers: ['Paris'],
-      },
-      {
-        question: 'What is the capital of Germany?',
-        type: 'single',
-        answers: ['Berlin'],
       },
     ],
     filename: undefined,
@@ -207,9 +192,9 @@ describe('Testing graphql api', () => {
     quizData = await createQuiz(app, {input: testQuiz}, userData.token!);
   });
 
-  // test create second quiz with second user
-  it('should create second quiz', async () => {
-    quizData2 = await createQuiz(app, {input: testQuiz2}, userData2.token!);
+  // test generate quiz
+  it('should generate quiz', async () => {
+    quizData2 = await generateQuiz(app, 'Finland', userData2.token!);
   });
 
   // test get all quizzes
@@ -253,6 +238,25 @@ describe('Testing graphql api', () => {
   // test delete quiz with wrong user
   it('should not delete quiz', async () => {
     await wrongDeleteQuiz(app, quizData2.id!, userData.token!);
+  });
+
+  /*
+   * Favorites tests
+   */
+
+  // test favorite add
+  it('should add favorite', async () => {
+    await favoritesAdd(app, quizData2.id!, userData.token!);
+  });
+
+  // test favorite get
+  it('should get favorite', async () => {
+    await favoritesGet(app, userData.token!);
+  });
+
+  // test favorite remove
+  it('should remove favorite', async () => {
+    await favoritesRemove(app, quizData2.id!, userData.token!);
   });
 
   /*

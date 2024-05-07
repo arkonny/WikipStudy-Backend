@@ -19,6 +19,9 @@ export const errors = {
   userNotOwner: new GraphQLError('User is not the owner of the quiz', {
     extensions: {code: 'UNAUTHORIZED'},
   }),
+  wrongInput: new GraphQLError('Wrong input', {
+    extensions: {code: 'BAD_USER_INPUT'},
+  }),
   envNotSet: new GraphQLError('Environment variable not set', {
     extensions: {code: 'DEV_ERROR'},
   }),

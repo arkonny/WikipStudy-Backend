@@ -29,6 +29,10 @@ const resultResolver = {
       const quiz = await quizModel.findById(args.input.quizId);
       if (!quiz) throw errors.notFound;
 
+      if (quiz.questions.length !== args.input.answers.length) {
+        throw errors.wrongInput;
+      }
+
       let score = 0;
       for (let i = 0; i < quiz.questions.length; i++) {
         if (quiz.questions[i].answers[0].toString() === args.input.answers[i]) {

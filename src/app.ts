@@ -78,7 +78,10 @@ app.use(
         if (process.env.NODE_ENV === 'development') {
           return formattedError;
         } else if (formattedError.extensions?.code !== 'DEV_ERROR') {
-          return formattedError;
+          return {
+            message: formattedError.message,
+            extensions: formattedError.extensions,
+          };
         }
 
         return new GraphQLError('Internal server error');

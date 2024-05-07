@@ -28,6 +28,7 @@ import {
 } from './quizFunctions';
 import {favoritesAdd, favoritesRemove, favoritesGet} from './favoriteFunctions';
 import {reportAdd} from './reportFunctions';
+import {answerQuiz} from './resultFunctions';
 
 describe('Testing graphql api', () => {
   beforeAll(async () => {
@@ -233,12 +234,25 @@ describe('Testing graphql api', () => {
 
   // test delete quiz
   it('should delete quiz', async () => {
-    await deleteQuiz(app, quizData.id!, userData.token!);
+    await deleteQuiz(app, quizData2.id!, userData2.token!);
   });
 
   // test delete quiz with wrong user
   it('should not delete quiz', async () => {
-    await wrongDeleteQuiz(app, quizData2.id!, userData.token!);
+    await wrongDeleteQuiz(app, quizData.id!, userData2.token!);
+  });
+
+  /*
+   * Result tests
+   */
+  // test answer quiz
+  it('should answer quiz', async () => {
+    const {score} = await answerQuiz(
+      app,
+      {quizId: quizData.id!, answers: ['Helsinki', 'Stockholm', 'Oslo']},
+      userData.token!,
+    );
+    expect(score).toBe(3);
   });
 
   /*
@@ -247,7 +261,7 @@ describe('Testing graphql api', () => {
 
   // test favorite add
   it('should add favorite', async () => {
-    await favoritesAdd(app, quizData2.id!, userData.token!);
+    await favoritesAdd(app, quizData.id!, userData.token!);
   });
 
   // test favorite get
@@ -257,7 +271,7 @@ describe('Testing graphql api', () => {
 
   // test favorite remove
   it('should remove favorite', async () => {
-    await favoritesRemove(app, quizData2.id!, userData.token!);
+    await favoritesRemove(app, quizData.id!, userData.token!);
   });
 
   /*
@@ -267,7 +281,7 @@ describe('Testing graphql api', () => {
   it('should add report', async () => {
     await reportAdd(
       app,
-      quizData2.id!,
+      quizData.id!,
       'This is a test report',
       userData.token!,
     );
@@ -281,14 +295,14 @@ describe('Testing graphql api', () => {
     await deleteUser(app, userData.token!);
   });
 
+  // test quiz deleted with user
+  it('should not find quiz', async () => {
+    await wrongQuizById(app, quizData.id!, adminData.token!);
+  });
+
   // test delete second user based on token
   it('should delete second user', async () => {
     await deleteUser(app, userData2.token!);
-  });
-
-  // test quiz deleted with user
-  it('should not find quiz', async () => {
-    await wrongQuizById(app, quizData2.id!, adminData.token!);
   });
 
   // test brute force protectiom

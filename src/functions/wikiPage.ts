@@ -12,6 +12,7 @@ const wikiPage = async (
       limit: '1',
       namespace: '0',
       format: 'json',
+      redirects: 1,
     })
   ).json();
 
@@ -48,6 +49,7 @@ const wikiPage = async (
     console.log('Disambiguation page:\n', dataPage.query.pages[0].extract);
     throw new GraphQLError('Disambiguation page');
   }
+  console.log('Title:', title);
 
   const image = await (
     await wikiAPICall({

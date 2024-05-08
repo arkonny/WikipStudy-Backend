@@ -39,8 +39,6 @@ const entitiesFinderCompromise = (sentence: string): SentenceEntities => {
   const peoples = doc.people().out('array');
   const places = doc.places().out('array');
   const organisations = doc.organizations().out('array');
-  console.log('Sentence: ', sentence);
-  console.log('Compromise entities: ', peoples, places, organisations);
   const entities: SentenceEntities = {
     sentence: sentence,
     entities: [],

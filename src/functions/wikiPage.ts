@@ -12,16 +12,16 @@ const wikiPage = async (
       limit: '1',
       namespace: '0',
       format: 'json',
-      redirects: 1,
     })
   ).json();
+  console.log('Search data:', dataSearch);
 
   if (!Array.isArray(dataSearch) || dataSearch[3].length === 0) {
-    console.log('No data from Wikipedia');
+    console.log('No data from Wikipedia :', dataSearch, '\n');
     throw new GraphQLError('No data from Wikipedia');
   }
 
-  const title = dataSearch[3][0].toString().replace(/.*\//g, '');
+  let title = dataSearch[3][0].toString().replace(/.*\//g, '');
 
   // Now we need to get the page content
   const dataPage = await (
@@ -49,7 +49,8 @@ const wikiPage = async (
     console.log('Disambiguation page:\n', dataPage.query.pages[0].extract);
     throw new GraphQLError('Disambiguation page');
   }
-  console.log('Title:', title);
+
+  title = dataPage.query.pages[0].title;
 
   const image = await (
     await wikiAPICall({

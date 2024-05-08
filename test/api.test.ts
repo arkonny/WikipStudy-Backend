@@ -63,7 +63,7 @@ describe('Testing graphql api', () => {
 
   const adminUser: UserTest = {
     email: 'admin@metropolia.fi',
-    password: '12345',
+    password: process.env.ADMIN_PASSWORD,
   };
 
   // Quiz variables

@@ -101,6 +101,7 @@ const userResolver = {
       const user = sanitizeUser(args.user);
       if (!process.env.AUTH_URL) throw errors.envNotSet;
       if (!context.userdata) throw errors.authUser;
+      if (!user.user_name || !user.email) throw errors.wrongInput;
       const options = {
         method: 'PUT',
         headers: {

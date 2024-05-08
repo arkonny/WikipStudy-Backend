@@ -66,13 +66,12 @@ const entitiesFinderCompromise = (sentence: string): SentenceEntities => {
 };
 
 const sentenceToQuestion = (sentence: SentenceEntities): Question => {
-  const regex = new RegExp(sentence.entities[0]);
   const replacement = sentence.entities[0]
     .replace(/[a-zA-Z]/g, 'x')
     .replace(/[0-9]/g, '#');
   return {
     question: sentence.sentence.replace(
-      regex,
+      sentence.entities[0],
       '[' + replacement + '] (' + sentence.types[0] + ')',
     ),
     type: 'single',

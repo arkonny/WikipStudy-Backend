@@ -29,7 +29,7 @@ const wikiPage = async (
       titles: title,
       action: 'query',
       prop: 'extracts',
-      exsentences: '5',
+      //exsentences: '5',
       explaintext: 1,
       formatversion: '2',
       format: 'json',

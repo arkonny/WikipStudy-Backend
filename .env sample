@@ -1,0 +1,7 @@
+NODE_ENV=development
+PORT=3000
+DATABASE_URL=
+JWT_SECRET=
+AUTH_URL=http://localhost:3001/api/v1
+UPLOAD_URL=http://localhost:3002/api/v1
+ADMIN_PASSWORD=

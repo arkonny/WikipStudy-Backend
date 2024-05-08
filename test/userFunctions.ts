@@ -33,6 +33,7 @@ const userById = (url: string | Application, id: string): Promise<UserTest> => {
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const user = response.body.data.userById;
           expect(user.id).toBe(id);
           expect(user).toHaveProperty('user_name');
@@ -85,6 +86,7 @@ const register = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const userData = response.body.data.register;
           expect(userData).toHaveProperty('message');
           expect(userData).toHaveProperty('user');
@@ -137,6 +139,7 @@ const login = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const user = vars.credentials;
           console.log('login response', response.body);
           const userData = response.body.data.login;
@@ -229,6 +232,7 @@ const checkToken = (url: string | Application, token: string) => {
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const userData = response.body.data.checkToken;
           expect(userData).toHaveProperty('message');
           expect(userData).toHaveProperty('user');
@@ -282,6 +286,7 @@ const updateUser = (url: string | Application, token: string) => {
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const userData = response.body.data.updateUser;
           expect(userData).toHaveProperty('message');
           expect(userData).toHaveProperty('user');
@@ -330,6 +335,7 @@ const deleteUser = (
         if (err) {
           reject(err);
         } else {
+          if (response.body.errors) reject(response.body.errors[0].message);
           const userData = response.body.data.deleteUser;
           expect(userData).toHaveProperty('message');
           expect(userData).toHaveProperty('user');

@@ -9,6 +9,7 @@ const its = nlpWink.its;
 const clarifyText = (text: string): string => {
   return text
     .replace(/\n/g, ' ') // Remove new lines
+    .replace(/\s*=+ [a-zA-Z0-9\s]+ =+/g, '. ') // Remove titles and replace by an end of sentence
     .replace(/([^a-zA-Z0-9\-_\s\p{Lu}\p{Ll}.])/gu, ' $1 ') // Add spaces around punctuation (when using compromise)
     .replace(/(\s)\s+/g, '$1'); // Remove multiple spaces
 };

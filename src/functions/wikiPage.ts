@@ -1,12 +1,12 @@
 import {GraphQLError} from 'graphql';
-import wikiAPI from './wikiAPI';
+import wikiAPICall from './wikiAPICall';
 
 // First we need to search for the page, allowing the user to write a more general search (still quite specific though)
 const wikiPage = async (
   search: string,
 ): Promise<{page: string; imageUrl: string}> => {
   const dataSearch = await (
-    await wikiAPI({
+    await wikiAPICall({
       search,
       action: 'opensearch',
       limit: '1',
@@ -14,17 +14,18 @@ const wikiPage = async (
       format: 'json',
     })
   ).json();
+  console.log('Search data:', dataSearch);
 
   if (!Array.isArray(dataSearch) || dataSearch[3].length === 0) {
-    console.log('No data from Wikipedia');
+    console.log('No data from Wikipedia :', dataSearch, '\n');
     throw new GraphQLError('No data from Wikipedia');
   }
 
-  const title = dataSearch[3][0].toString().replace(/.*\//g, '');
+  let title = dataSearch[3][0].toString().replace(/.*\//g, '');
 
   // Now we need to get the page content
   const dataPage = await (
-    await wikiAPI({
+    await wikiAPICall({
       titles: title,
       action: 'query',
       prop: 'extracts',
@@ -49,8 +50,10 @@ const wikiPage = async (
     throw new GraphQLError('Disambiguation page');
   }
 
+  title = dataPage.query.pages[0].title;
+
   const image = await (
-    await wikiAPI({
+    await wikiAPICall({
       titles: title,
       action: 'query',
       prop: 'pageimages',

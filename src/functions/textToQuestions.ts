@@ -1,7 +1,8 @@
 import model from 'wink-eng-lite-web-model';
 import {GraphQLError} from 'graphql';
-import winkNLP, {ItemSentence} from 'wink-nlp';
+import winkNLP, {Document} from 'wink-nlp';
 import {Question} from '../types/DBTypes';
+import nlp from 'compromise/three';
 const nlpWink = winkNLP(model);
 const its = nlpWink.its;
 
@@ -12,10 +13,71 @@ const clarifyText = (text: string): string => {
     .replace(/(\s)\s+/g, '$1'); // Remove multiple spaces
 };
 
-type Sentence = {
+type SentenceEntities = {
   sentence: string;
   entities: string[];
   types: string[];
+};
+
+const entitiesFinderWink = (sentence: string): SentenceEntities | undefined => {
+  const doc: Document = nlpWink.readDoc(sentence);
+  const entities: SentenceEntities = {
+    sentence: sentence,
+    entities: [],
+    types: [],
+  };
+  if (doc.entities().itemAt(0) !== undefined) {
+    entities.entities = doc.entities().out();
+    entities.types = doc.entities().out(its.type);
+    return entities;
+  }
+  return undefined;
+};
+
+const entitiesFinderCompromise = (sentence: string): SentenceEntities => {
+  const doc = nlp(sentence);
+  const peoples = doc.people().out('array');
+  const places = doc.places().out('array');
+  const organisations = doc.organizations().out('array');
+  const entities: SentenceEntities = {
+    sentence: sentence,
+    entities: [],
+    types: [],
+  };
+  if (peoples.length > 0) {
+    peoples.forEach((person: string) => {
+      entities.entities.push(person);
+      entities.types.push('Person');
+    });
+  }
+  if (places.length > 0) {
+    places.forEach((place: string) => {
+      entities.entities.push(place);
+      entities.types.push('Place');
+    });
+  }
+  if (organisations.length > 0) {
+    organisations.forEach((organisation: string) => {
+      entities.entities.push(organisation);
+      entities.types.push('Organisation');
+    });
+  }
+  return entities;
+};
+
+const sentenceToQuestion = (sentence: SentenceEntities): Question => {
+  const regex = new RegExp(sentence.entities[0]);
+  const replacement = sentence.entities[0]
+    .replace(/[a-zA-Z]/g, 'x')
+    .replace(/[0-9]/g, '#');
+  return {
+    question: sentence.sentence.replace(
+      regex,
+      '[' + replacement + '] (' + sentence.types[0] + ')',
+    ),
+    type: 'single',
+    answers: [sentence.entities[0]],
+  };
 };
 
 const textToQuestions = async (inputText: string): Promise<Question[]> => {
@@ -28,30 +90,20 @@ const textToQuestions = async (inputText: string): Promise<Question[]> => {
     throw new GraphQLError('Not enough sentences');
   }
 
-  const sentencesEntitiesWink: Sentence[] = [];
-  doc.sentences().each((sentence: ItemSentence) => {
-    if (sentence.entities().itemAt(0) !== undefined) {
-      sentencesEntitiesWink.push({
-        sentence: sentence.out(),
-        entities: sentence.entities().out(),
-        types: sentence.entities().out(its.type),
-      });
-    }
+  const sentencesEntities: SentenceEntities[] = [];
+  sentences.forEach((sentence) => {
+    let entities = entitiesFinderWink(sentence);
+    if (!entities) entities = entitiesFinderCompromise(sentence);
+    if (entities) sentencesEntities.push(entities);
   });
 
   const questions: Question[] = [];
 
-  sentencesEntitiesWink.forEach((sentence: Sentence) => {
-    const regex = new RegExp(sentence.entities[0]);
-    const question: Question = {
-      question: sentence.sentence.replace(
-        regex,
-        '_[' + sentence.types[0] + ']_',
-      ),
-      type: 'single',
-      answers: [sentence.entities[0]],
-    };
-    questions.push(question);
+  sentencesEntities.forEach((sentence) => {
+    if (sentence.entities.length !== 0) {
+      const question = sentenceToQuestion(sentence);
+      questions.push(question);
+    }
   });
 
   return questions;
